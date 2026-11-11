@@ -1,0 +1,40 @@
+﻿name: Monitor do CRM
+
+# Confere a cada 10 minutos se o CRM esta no ar. Se falhar, o GitHub avisa por e-mail.
+# Nao usa senha nem segredo: so visita paginas publicas.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: A tela de login abre
+        run: |
+          for i in 1 2 3; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 https://crm.oliengenharia.com.br/login || echo 000)
+            echo "tentativa $i: login respondeu $code"
+            if [ "$code" = "200" ]; then exit 0; fi
+            sleep 20
+          done
+          echo "O site nao respondeu."
+          exit 1
+
+      - name: O CRM consegue falar com o banco
+        run: |
+          # um link de proposta que nao existe: se o banco responde, o CRM diz "link nao disponivel"; se o banco caiu, diz "nao foi possivel abrir"
+          url="https://crm.oliengenharia.com.br/p/monitoramento0000000000000000"
+          for i in 1 2 3; do
+            body=$(curl -s --compressed --max-time 25 "$url" || true)
+            if echo "$body" | grep -q "mais dispon"; then echo "tentativa $i: banco respondeu"; exit 0; fi
+            echo "tentativa $i: sem resposta do banco"
+            sleep 20
+          done
+          echo "O CRM nao conseguiu falar com o banco."
+          exit 1

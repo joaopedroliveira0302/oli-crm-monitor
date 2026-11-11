@@ -1,0 +1,21 @@
+﻿name: Manter o monitor ativo
+
+# O GitHub desliga agendamentos de repositorio publico parado ha 60 dias.
+# Uma vez por mes, este fluxo religa o monitor para o relogio nao zerar.
+on:
+  schedule:
+    - cron: "0 12 1 * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  manter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Religar o monitor
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow enable monitor.yml --repo "${{ github.repository }}" || true
