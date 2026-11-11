@@ -3,6 +3,8 @@
 # Confere a cada 10 minutos se o CRM esta no ar. Se falhar, o GitHub avisa por e-mail.
 # Nao usa senha nem segredo: so visita paginas publicas.
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: "*/10 * * * *"
   workflow_dispatch:
@@ -38,3 +40,4 @@ jobs:
           done
           echo "O CRM nao conseguiu falar com o banco."
           exit 1
+
