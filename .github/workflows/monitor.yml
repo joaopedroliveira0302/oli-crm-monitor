@@ -20,7 +20,7 @@ jobs:
       - name: A tela de login abre
         run: |
           for i in 1 2 3; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 https://crm.oliengenharia.com.br/login || echo 000)
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 https://crm.oliengenharia.com.br/teste-de-alarme-pagina-inexistente || echo 000)
             echo "tentativa $i: login respondeu $code"
             if [ "$code" = "200" ]; then exit 0; fi
             sleep 20
@@ -40,4 +40,5 @@ jobs:
           done
           echo "O CRM nao conseguiu falar com o banco."
           exit 1
+
 
